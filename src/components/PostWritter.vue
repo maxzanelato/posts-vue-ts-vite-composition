@@ -29,7 +29,10 @@
 
   <div class="columns">
     <div class="column">
-      <button class="button is-primary is-pulled-right">
+      <button
+        class="button is-primary is-pulled-right"
+        @click="handleClick"
+      >
         Save post
       </button>
     </div>
@@ -42,7 +45,9 @@ import { ref, onMounted, watch } from 'vue';
 import { marked } from 'marked';
 import debounce from 'lodash/debounce';
 import highlightjs from 'highlight.js';
+import { useRouter } from 'vue-router';
 
+import { usePosts } from '@/stores/posts';
 import { TimelinePost } from '@/interfaces/posts';
 
 const props = defineProps<{
@@ -53,6 +58,9 @@ const html = ref('');
 const title = ref(props.post.title);
 const content = ref(props.post.markdown);
 const contentEditable = ref<HTMLDivElement>();
+
+const router = useRouter();
+const { createPost } = usePosts();
 
 const handleInput = () => {
   if (!contentEditable.value) {
@@ -73,6 +81,19 @@ const parseHtml = (markdown: string) => {
       html.value = parseResult;
     }
   );
+};
+
+const handleClick = async () => {
+  const newPost: TimelinePost = {
+    ...props.post,
+    title: title.value,
+    markdown: content.value,
+    html: html.value,
+  };
+
+  await createPost(newPost);
+
+  router.push('/');
 };
 
 watch(
