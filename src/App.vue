@@ -1,4 +1,21 @@
 <template>
+  <div
+    class="modal"
+    style="display: block; color: white"
+    :style="modalStyle"
+  >
+    <div class="modal-background">
+      <div class="modal-content">
+        <div id="modal"></div>
+      </div>
+    </div>
+
+    <button
+      class="modal-close is-large"
+      @click="modal.hideModal()"
+    ></button>
+  </div>
+
   <div class="section">
     <div class="container">
       <Navbar />
@@ -8,7 +25,22 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
+import { useUsers } from './stores/users';
 import Navbar from './components/Navbar.vue';
+import { useModal } from './composables/modal';
+
+const modal = useModal();
+const userStore = useUsers();
+
+const modalStyle = computed(() => {
+  return {
+    display: modal.show.value ? 'block' : 'none',
+  };
+});
+
+userStore.authenticate();
 </script>
 
 <style>
